@@ -10,9 +10,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/03/31 12:49:41 +0200 $
-# $Revision: 6 $
-# $Snapshot: /Tk-DataTree/0.03 $
+# $Date: 2004/04/04 11:50:38 +0200 $
+# $Revision: 8 $
+# $Snapshot: /Tk-DataTree/0.04 $
 # $Source: /lib/Tk/DataTree.pm $
 #
 ################################################################################
@@ -26,18 +26,26 @@
 package Tk::DataTree;
 
 use strict;
-use XSLoader;
+use vars qw($VERSION);
+
+BEGIN {
+  $VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.04 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+  eval {
+    local $ENV{PERL_DL_NONLAZY} = 0 if $ENV{PERL_DL_NONLAZY};
+    require DynaLoader;
+    local @Tk::DataTree::ISA = qw(DynaLoader);
+    bootstrap Tk::DataTree $VERSION;
+  };
+
+  # use a rather simple approximation if we don't have the XS...
+  $@ and *_getval = sub { $_[0] };
+}
+
 use Tk;
 use Tk::ItemStyle;
 use Tk::widgets qw(Tree);
-use vars qw($VERSION);
-use constant ROOTTYPE => 'TYPE';
-
-$VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.03 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
-
-XSLoader::load 'Tk::DataTree', $VERSION;
-
 use base qw(Tk::Tree);
+use constant ROOTTYPE => 'TYPE';
 
 Construct Tk::Widget 'DataTree';
 

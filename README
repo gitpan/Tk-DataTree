@@ -37,8 +37,6 @@ different make program, such as 'nmake', instead of 'make'.
 This module requires these other modules and libraries:
 
   Tk (obviously)
-  XSLoader
-  Scalar::Util (only for testing)
 
 ------------
 4. COPYRIGHT

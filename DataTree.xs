@@ -10,9 +10,9 @@
 *
 * $Project: /Tk-DataTree $
 * $Author: mhx $
-* $Date: 2004/03/30 18:41:17 +0200 $
-* $Revision: 4 $
-* $Snapshot: /Tk-DataTree/0.03 $
+* $Date: 2004/04/03 19:55:16 +0200 $
+* $Revision: 6 $
+* $Snapshot: /Tk-DataTree/0.04 $
 * $Source: /DataTree.xs $
 *
 ********************************************************************************

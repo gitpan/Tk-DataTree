@@ -2,9 +2,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/03/31 12:50:01 +0200 $
-# $Revision: 5 $
-# $Snapshot: /Tk-DataTree/0.03 $
+# $Date: 2004/04/04 11:51:36 +0200 $
+# $Revision: 6 $
+# $Snapshot: /Tk-DataTree/0.04 $
 # $Source: /t/102_stress.t $
 #
 ################################################################################
@@ -20,7 +20,16 @@ BEGIN { plan tests => 100 }
 
 use Tk;
 use Tk::DataTree;
-use Scalar::Util qw(dualvar);
+
+eval {
+  require Scalar::Util;
+  *dualvar = \&Scalar::Util::dualvar;
+};
+
+if ($@) {
+  print "# Scalar::Util not installed\n";
+  *dualvar = sub { "$_[1] ($_[0])" };
+}
 
 my $sleep = $ENV{DATATREE_TEST_SLEEP} || 0;
 
