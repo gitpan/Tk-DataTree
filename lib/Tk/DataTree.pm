@@ -10,9 +10,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/03/31 09:59:20 +0200 $
-# $Revision: 4 $
-# $Snapshot: /Tk-DataTree/0.02 $
+# $Date: 2004/03/31 12:49:41 +0200 $
+# $Revision: 6 $
+# $Snapshot: /Tk-DataTree/0.03 $
 # $Source: /lib/Tk/DataTree.pm $
 #
 ################################################################################
@@ -33,7 +33,7 @@ use Tk::widgets qw(Tree);
 use vars qw($VERSION);
 use constant ROOTTYPE => 'TYPE';
 
-$VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.02 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.03 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 
 XSLoader::load 'Tk::DataTree', $VERSION;
 
@@ -130,6 +130,14 @@ static char *folder[] = {
 FOLDER
 );
 
+sub ClassInit
+{
+  my($class, $mw) = @_;
+  $class->SUPER::ClassInit($mw);
+  $mw->bind($class, '<Destroy>', 'Destroyer');
+  return $class;
+}
+
 sub Populate
 {
   my($self, $args) = @_;
@@ -144,10 +152,10 @@ sub Populate
     $self->Pixmap($pix, data => $ICON{$pix});
   }
 
-  $self->{_snode}   = $self->ItemStyle('imagetext', -stylename => 'DTnode');
-  $self->{_snormal} = $self->ItemStyle('imagetext', -stylename => 'DTnormal');
-  $self->{_sactive} = $self->ItemStyle('imagetext', -stylename => 'DTactive');
-  $self->{_sundef}  = $self->ItemStyle('imagetext', -stylename => 'DTundef');
+  for my $style (qw(node normal active undef)) {
+    $self->{"_s$style"} = $self->ItemStyle('imagetext');
+    $self->Advertise("${style}style" => $self->{"_s$style"});
+  }
 
   $self->ConfigSpecs(
     '-data'        => ['METHOD', undef, undef, undef],
@@ -155,11 +163,14 @@ sub Populate
     '-activecolor' => ['METHOD', undef, undef, '#FF0000'],
     '-undefcolor'  => ['METHOD', undef, undef, '#0080FF'],
   );
+}
 
-  $self->Advertise(nodestyle   => $self->{_snode});
-  $self->Advertise(normalstyle => $self->{_snormal});
-  $self->Advertise(activestyle => $self->{_sactive});
-  $self->Advertise(undefstyle  => $self->{_sundef});
+sub Destroyer
+{
+  my $self = shift;
+  for my $style (qw(node normal active undef)) {
+    $self->{"_s$style"}->delete;
+  }
 }
 
 sub typename
@@ -209,7 +220,7 @@ sub data
     $self->info('exists', ROOTTYPE) or $self->add(ROOTTYPE);
     $self->itemConfigure(ROOTTYPE, 0, -text  => $t,
                                       -image => $isnode ? 'folder' : 'file',
-                                      -style => $isnode ? 'DTnode' : 'DTnormal');
+                                      -style => $isnode ? $self->{_snode} : $self->{_snormal});
 
     $self->{_data}    = $data;
     $self->{_old}     = $self->_refresh(ROOTTYPE, $data, $self->{_old});
@@ -277,7 +288,7 @@ sub _refresh
       my $path = "$pre/$k";
       if (ref $v) {
         $self->info('exists', $path)
-            or $self->add($path, -text => $k, -image => 'folder', -style => 'DTnode');
+            or $self->add($path, -text => $k, -image => 'folder', -style => $self->{_snode});
       }
       $old->{$k} = $self->_refresh($path, $v, $o, $k);
     }
@@ -287,7 +298,7 @@ sub _refresh
       my $path = "$pre/$k";
       if (ref $val->[$k]) {
         $self->info('exists', $path)
-            or $self->add($path, -text => "[$k]", -image => 'folder', -style => 'DTnode');
+            or $self->add($path, -text => "[$k]", -image => 'folder', -style => $self->{_snode});
       }
       $old->[$k] = $self->_refresh($path, $val->[$k], $req ? $old->[$k] : undef, "[$k]");
     }
@@ -296,19 +307,17 @@ sub _refresh
     my($v, $style);
     if (defined $val) {
       $v = _getval($val);
-      $style = defined($old) && $v eq $old ? 'DTnormal' : 'DTactive';
+      $style = defined($old) && $v eq $old ? $self->{_snormal} : $self->{_sactive};
     }
     else {
       $v = '[undef]';
-      $style = 'DTundef';
+      $style = $self->{_sundef};
     }
-    my $text = defined $key ? "$key: $v" : $v;
-    if ($self->info('exists', $pre)) {
-      $self->itemConfigure($pre, 0, -text => $text, -style => $style);
+    unless ($self->info('exists', $pre)) {
+      $self->add($pre, -image => 'file');
     }
-    else {
-      $self->add($pre, -text => $text, -style => $style, -image => 'file');
-    }
+    $self->itemConfigure($pre, 0, -text => defined $key ? "$key: $v" : $v,
+                                  -style => $style);
     $old = $v;
   }
 

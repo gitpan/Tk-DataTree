@@ -2,9 +2,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/03/31 09:59:46 +0200 $
-# $Revision: 4 $
-# $Snapshot: /Tk-DataTree/0.02 $
+# $Date: 2004/03/31 12:50:01 +0200 $
+# $Revision: 5 $
+# $Snapshot: /Tk-DataTree/0.03 $
 # $Source: /t/102_stress.t $
 #
 ################################################################################
@@ -16,7 +16,7 @@
 ################################################################################
 
 use Test;
-BEGIN { plan tests => 200 }
+BEGIN { plan tests => 100 }
 
 use Tk;
 use Tk::DataTree;
@@ -25,37 +25,62 @@ use Scalar::Util qw(dualvar);
 my $sleep = $ENV{DATATREE_TEST_SLEEP} || 0;
 
 my $mw = new MainWindow;
-$mw->geometry("480x600");
+$mw->geometry("800x600");
 
-my $dt = $mw->Scrolled('DataTree', -activecolor => getcolor(),
-                                   -scrollbars  => 'e')
-            ->pack(-fill => 'both', -expand => 1);
+my @dt = map {
+           getwidget()->pack(-fill => 'both', -expand => 1, -side => 'left')
+         } 1 .. 4;
 
 srand 0;
 my $string = 'aaaaa';
 
 $mw->idletasks;
 
-for (1 .. 200) {
+for (1 .. 100) {
   s/#.*//;
   /\S/ or next;
-  my $r = getrand();
-  if (rand() < 0.5) {
-    $dt->data($r);
+  for my $dt (@dt) {
+    if (rand() < 0.1) {
+      $dt->packForget;
+      $dt->destroy;
+      $dt = getwidget()->pack(-fill => 'both', -expand => 1, -side => 'left');
+    }
+    my $r = getrand();
+    if (rand() < 0.5) {
+      $dt->data($r);
+    }
+    else {
+      $dt->configure(-data => $r);
+    }
+    $dt->autosetmode;
+    $dt->configure(-undefcolor => getcolor());
+    my $w = $dt->Subwidget('scrolled') || $dt;
+    $w->Subwidget('normalstyle')
+      ->configure(-fg => getcolor(), -background => getcolor());
+    $w->Subwidget('nodestyle')
+      ->configure(-fg => getcolor(), -background => getcolor());
+    $w->Subwidget('activestyle')
+      ->configure(-fg => getcolor(), -background => getcolor());
   }
-  else {
-    $dt->configure(-data => $r);
-  }
-  $dt->configure(-undefcolor => getcolor());
-  $dt->Subwidget('scrolled')->Subwidget('normalstyle')
-     ->configure(-fg => getcolor(), -background => getcolor());
-  $dt->Subwidget('scrolled')->Subwidget('nodestyle')
-     ->configure(-fg => getcolor(), -background => getcolor());
-  $dt->Subwidget('scrolled')->Subwidget('activestyle')
-     ->configure(-fg => getcolor(), -background => getcolor());
   $mw->idletasks;
   ok($@,'');
   select undef, undef, undef, $sleep;
+}
+
+sub getwidget
+{
+  my $r = rand 3;
+  if ($r < 1) {
+    return $mw->Scrolled('DataTree', -activecolor => getcolor(),
+                                     -scrollbars  => 'sw');
+  }
+  elsif ($r < 2) {
+    return $mw->DataTree(-activecolor => getcolor());
+  }
+  else {
+    return $mw->Scrolled('DataTree', -activecolor => getcolor(),
+                                     -scrollbars  => 'e');
+  }
 }
 
 sub getcolor

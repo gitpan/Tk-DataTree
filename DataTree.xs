@@ -12,7 +12,7 @@
 * $Author: mhx $
 * $Date: 2004/03/30 18:41:17 +0200 $
 * $Revision: 4 $
-* $Snapshot: /Tk-DataTree/0.02 $
+* $Snapshot: /Tk-DataTree/0.03 $
 * $Source: /DataTree.xs $
 *
 ********************************************************************************
