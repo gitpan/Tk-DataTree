@@ -2,9 +2,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/03/30 18:26:19 +0200 $
-# $Revision: 3 $
-# $Snapshot: /Tk-DataTree/0.01 $
+# $Date: 2004/03/31 09:59:30 +0200 $
+# $Revision: 4 $
+# $Snapshot: /Tk-DataTree/0.02 $
 # $Source: /t/101_base.t $
 #
 ################################################################################
@@ -16,7 +16,7 @@
 ################################################################################
 
 use Test;
-BEGIN { plan tests => 35 }
+BEGIN { plan tests => 38 }
 
 use Tk;
 use Tk::DataTree;
@@ -43,49 +43,53 @@ while( <DATA> ) {
 
 __DATA__
 
-$dt->update( { foo => { bar => [ 1 ] } } );
+$dt->configure(-typename => 'nothing');
 
-$dt->update( undef );
+$dt->data( { foo => { bar => [ 1 ] } } );
+
+$dt->data( undef );
 $dt->configure(-typename => 'typeA');
-$dt->update( 'foo' );
+$dt->data( 'foo' );
 $dt->configure(-typename => 'typeB');
-$dt->update( 123 );
+$dt->data( 123 );
 $dt->configure(-typename => 'typeC');
-$dt->update( 3.14159 );
+$dt->data( 3.14159 );
 
-$dt->update( { foo => { bar => [ 1 ] } } );
-$dt->update( { foo => { bar => [ 1, 2 ] } } );
-$dt->update( { foo => { bar => [ 1, 2, 3 ] } } );
-$dt->update( { foo => { bar => [ 1, 2, 3 ] }, xyz => 123 } );
+$dt->configure( -data => { foo => { bar => [ 1 ] } } );
+$dt->configure( -data => { foo => { bar => [ 1, 2 ] } } );
+$dt->configure( -data => { foo => { bar => [ 1, 2, 3 ] } } );
+$dt->configure( -data => { foo => { bar => [ 1, 2, 3 ] }, xyz => 123 } );
 
-$dt->update( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 123 } );
-$dt->update( { foo => { bar => [ 1, 3, 3 ], baz => "xxx" }, xyz => 123 } );
-$dt->update( { foo => { bar => [ 1, 3, 3 ], baz => "xx" }, xyz => 123 } );
-$dt->update( { foo => { bar => [ 1, 3, 3 ], baz => "xx" }, xyz => 42 } );
-$dt->update( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 123 } );
-$dt->update( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, 3, 3 ], baz => "xxx" }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, 3, 3 ], baz => "xx" }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, 3, 3 ], baz => "xx" }, xyz => 42 } );
+$dt->data( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 123 } );
 
 $dt->configure(-activecolor => '#00A000', -typename => 'foobar');
 
-$dt->update( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => dualvar(123, 'Hello') } );
-$dt->update( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => dualvar(123, 'World') } );
-$dt->update( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => dualvar(456, 'World') } );
-$dt->update( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 'World' } );
-$dt->update( { foo => { bar => [ 1, [2, 3], {four => 4, five => 5} ], baz => "xxx" }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => dualvar(123, 'Hello') } );
+$dt->data( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => dualvar(123, 'World') } );
+$dt->data( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => dualvar(456, 'World') } );
+$dt->data( { foo => { bar => [ 1, 2, 3 ], baz => "xxx" }, xyz => 'World' } );
+$dt->data( { foo => { bar => [ 1, [2, 3], {four => 4, five => 5} ], baz => "xxx" }, xyz => 123 } );
 
 $dt->configure(-activecolor => '#A000A0');
+$dt->Subwidget('normalstyle')->configure(-fg => '#FFFFFF');
+$dt->Subwidget('nodestyle')->configure(-fg => '#0000FF');
 
-$dt->update( { foo => { bar => [ 1, [2], {four => 4} ], baz => "xxx" }, xyz => 123 } );
-$dt->update( { foo => { bar => [ 1, [2], {four => 4} ] }, xyz => 123 } );
-$dt->update( { foo => { bar => [ 1, [2], {four => 4} ] } } );
-$dt->update( { foo => { bar => [ 1, [2] ] } } );
-$dt->update( { foo => { bar => [ 1 ] } } );
+$dt->data( { foo => { bar => [ 1, [2], {four => 4} ], baz => "xxx" }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, [2], {four => 4} ] }, xyz => 123 } );
+$dt->data( { foo => { bar => [ 1, [2], {four => 4} ] } } );
+$dt->data( { foo => { bar => [ 1, [2] ] } } );
+$dt->data( { foo => { bar => [ 1 ] } } );
 
-$dt->update( { foo => { bar => [ 1, undef ] } } );
-$dt->update( { foo => { bar => [ 1, undef ] }, baz => undef } );
+$dt->data( { foo => { bar => [ 1, undef ] } } );
+$dt->data( { foo => { bar => [ 1, undef ] }, baz => undef } );
 
 $dt->configure(-undefcolor => '#A0A000');
 
-$dt->update( { foo => { bar => [ 1 ] }, baz => undef } );
-$dt->update( { baz => undef } );
+$dt->data( { foo => { bar => [ 1 ] }, baz => undef } );
+$dt->data( { baz => undef } );
 

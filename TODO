@@ -1,2 +1,4 @@
 * output values as hex/oct/bin?
+  (may need to cache "real" old values?)
 * make XS part optional
+* better icons? (configurable?)

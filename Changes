@@ -1,4 +1,18 @@
 -------------------------
+Version 0.02 (2004-03-31)
+-------------------------
+
+* the update method wasn't compatible with
+  Scrolled widgets, changed to data method
+
+* data can now also be configured using
+  configure(-data => $data);
+
+* added styles for normal and node items
+
+* all styles are now advertised subwidgets
+
+-------------------------
 Version 0.01 (2004-03-30)
 -------------------------
 

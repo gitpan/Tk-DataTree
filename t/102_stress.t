@@ -2,9 +2,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/03/30 18:26:19 +0200 $
-# $Revision: 3 $
-# $Snapshot: /Tk-DataTree/0.01 $
+# $Date: 2004/03/31 09:59:46 +0200 $
+# $Revision: 4 $
+# $Snapshot: /Tk-DataTree/0.02 $
 # $Source: /t/102_stress.t $
 #
 ################################################################################
@@ -16,7 +16,7 @@
 ################################################################################
 
 use Test;
-BEGIN { plan tests => 100 }
+BEGIN { plan tests => 200 }
 
 use Tk;
 use Tk::DataTree;
@@ -27,20 +27,32 @@ my $sleep = $ENV{DATATREE_TEST_SLEEP} || 0;
 my $mw = new MainWindow;
 $mw->geometry("480x600");
 
-my $dt = $mw->DataTree->pack( -fill => 'both', -expand => 1 );
+my $dt = $mw->Scrolled('DataTree', -activecolor => getcolor(),
+                                   -scrollbars  => 'e')
+            ->pack(-fill => 'both', -expand => 1);
 
 srand 0;
 my $string = 'aaaaa';
 
 $mw->idletasks;
 
-for (1 .. 100) {
+for (1 .. 200) {
   s/#.*//;
   /\S/ or next;
   my $r = getrand();
-  $dt->update($r);
-  $dt->configure(-activecolor => getcolor(),
-                 -undefcolor  => getcolor());
+  if (rand() < 0.5) {
+    $dt->data($r);
+  }
+  else {
+    $dt->configure(-data => $r);
+  }
+  $dt->configure(-undefcolor => getcolor());
+  $dt->Subwidget('scrolled')->Subwidget('normalstyle')
+     ->configure(-fg => getcolor(), -background => getcolor());
+  $dt->Subwidget('scrolled')->Subwidget('nodestyle')
+     ->configure(-fg => getcolor(), -background => getcolor());
+  $dt->Subwidget('scrolled')->Subwidget('activestyle')
+     ->configure(-fg => getcolor(), -background => getcolor());
   $mw->idletasks;
   ok($@,'');
   select undef, undef, undef, $sleep;

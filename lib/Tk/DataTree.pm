@@ -10,9 +10,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/03/30 18:26:33 +0200 $
-# $Revision: 3 $
-# $Snapshot: /Tk-DataTree/0.01 $
+# $Date: 2004/03/31 09:59:20 +0200 $
+# $Revision: 4 $
+# $Snapshot: /Tk-DataTree/0.02 $
 # $Source: /lib/Tk/DataTree.pm $
 #
 ################################################################################
@@ -33,7 +33,7 @@ use Tk::widgets qw(Tree);
 use vars qw($VERSION);
 use constant ROOTTYPE => 'TYPE';
 
-$VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.01 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+$VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.02 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
 
 XSLoader::load 'Tk::DataTree', $VERSION;
 
@@ -144,14 +144,22 @@ sub Populate
     $self->Pixmap($pix, data => $ICON{$pix});
   }
 
-  $self->{_activecolor} = $self->ItemStyle('imagetext', -stylename => 'DTactive');
-  $self->{_undefcolor}  = $self->ItemStyle('imagetext', -stylename => 'DTundef');
+  $self->{_snode}   = $self->ItemStyle('imagetext', -stylename => 'DTnode');
+  $self->{_snormal} = $self->ItemStyle('imagetext', -stylename => 'DTnormal');
+  $self->{_sactive} = $self->ItemStyle('imagetext', -stylename => 'DTactive');
+  $self->{_sundef}  = $self->ItemStyle('imagetext', -stylename => 'DTundef');
 
   $self->ConfigSpecs(
+    '-data'        => ['METHOD', undef, undef, undef],
     '-typename'    => ['METHOD', undef, undef, undef],
     '-activecolor' => ['METHOD', undef, undef, '#FF0000'],
     '-undefcolor'  => ['METHOD', undef, undef, '#0080FF'],
   );
+
+  $self->Advertise(nodestyle   => $self->{_snode});
+  $self->Advertise(normalstyle => $self->{_snormal});
+  $self->Advertise(activestyle => $self->{_sactive});
+  $self->Advertise(undefstyle  => $self->{_sundef});
 }
 
 sub typename
@@ -171,37 +179,43 @@ sub activecolor
 {
   my($self, $val) = @_;
   if (@_ > 1) {
-    $self->{_activecolor}->configure(-fg => $val);
+    $self->{_sactive}->configure(-fg => $val);
   }
-  $self->{_activecolor}->cget('-fg');
+  $self->{_sactive}->cget('-fg');
 }
 
 sub undefcolor
 {
   my($self, $val) = @_;
   if (@_ > 1) {
-    $self->{_undefcolor}->configure(-fg => $val);
+    $self->{_sundef}->configure(-fg => $val);
   }
-  $self->{_undefcolor}->cget('-fg');
+  $self->{_sundef}->cget('-fg');
 }
 
-sub update
+sub data
 {
   my($self, $data) = @_;
 
-  my $t = $self->{_typename} || (ref $data ? "$data" : ROOTTYPE);
+  if (@_ > 1) {
+    my $t = $self->{_typename} || (ref $data ? "$data" : ROOTTYPE);
 
-  if (exists $self->{_old}) {
-    $self->{_old} = $self->_cleanup(ROOTTYPE, $data, $self->{_old});
+    if (exists $self->{_old}) {
+      $self->{_old} = $self->_cleanup(ROOTTYPE, $data, $self->{_old});
+    }
+
+    my $isnode = ref($data) =~ /^(?:ARRAY|HASH)$/;
+
+    $self->info('exists', ROOTTYPE) or $self->add(ROOTTYPE);
+    $self->itemConfigure(ROOTTYPE, 0, -text  => $t,
+                                      -image => $isnode ? 'folder' : 'file',
+                                      -style => $isnode ? 'DTnode' : 'DTnormal');
+
+    $self->{_data}    = $data;
+    $self->{_old}     = $self->_refresh(ROOTTYPE, $data, $self->{_old});
+    $self->{_oldtype} = $t;
   }
-
-  $self->info('exists', ROOTTYPE) or $self->add(ROOTTYPE);
-  $self->itemConfigure(ROOTTYPE, 0, -text  => $t,
-                                    -image => ref($data) =~ /^(?:ARRAY|HASH)$/
-                                              ? 'folder' : 'file');
-
-  $self->{_old} = $self->_refresh(ROOTTYPE, $data, $self->{_old});
-  $self->{_oldtype} = $t;
+  $self->{_data};
 }
 
 sub _cleanup
@@ -263,7 +277,7 @@ sub _refresh
       my $path = "$pre/$k";
       if (ref $v) {
         $self->info('exists', $path)
-            or $self->add($path, -text => $k, -image => 'folder');
+            or $self->add($path, -text => $k, -image => 'folder', -style => 'DTnode');
       }
       $old->{$k} = $self->_refresh($path, $v, $o, $k);
     }
@@ -273,7 +287,7 @@ sub _refresh
       my $path = "$pre/$k";
       if (ref $val->[$k]) {
         $self->info('exists', $path)
-            or $self->add($path, -text => "[$k]", -image => 'folder');
+            or $self->add($path, -text => "[$k]", -image => 'folder', -style => 'DTnode');
       }
       $old->[$k] = $self->_refresh($path, $val->[$k], $req ? $old->[$k] : undef, "[$k]");
     }
@@ -282,7 +296,7 @@ sub _refresh
     my($v, $style);
     if (defined $val) {
       $v = _getval($val);
-      $style = defined($old) && $v eq $old ? undef : 'DTactive';
+      $style = defined($old) && $v eq $old ? 'DTnormal' : 'DTactive';
     }
     else {
       $v = '[undef]';
@@ -317,12 +331,13 @@ Tk::DataTree - A tree widget for arbitrary data structures
   $mw = new MainWindow;
   $dt = $mw->DataTree;
   
-  $dt->update( { foo => 1, bar => [2, 3] } );
+  $dt->data( { foo => 1, bar => [2, 3] } );
 
 =head1 DESCRIPTION
 
 The Tk::DataTree class is a derivate of L<Tk::Tree> intended
 for displaying arbitrary data structures.
+It's a bit like having L<Data::Dumper> as a Tk widget.
 
 =head1 WIDGET-SPECIFIC OPTIONS
 
@@ -333,11 +348,16 @@ for displaying arbitrary data structures.
 If the data structure is an array or hash, this is the
 label of the root node.
 
+=item B<-data>
+
+Configuring this option is equivalent to calling
+the C<data> method.
+
 =item B<-activecolor>
 
 The color that is used for changing (active) items. An item
 is considered active if it is new or it has changed its
-value since the last C<update> call.
+value since the last C<data> call.
 
 =item B<-undefcolor>
 
@@ -345,16 +365,42 @@ The color that is used for items whose value is C<undef>.
 
 =back
 
+=head1 ADVERTISED WIDGETS
+
+=over 4
+
+=item B<nodestyle>
+
+A C<Tk::ItemStyle> object that allows you to configure the
+appearance of the node tree items.
+
+=item B<normalstyle>
+
+A C<Tk::ItemStyle> object that allows you to configure the
+appearance of the normal tree items.
+
+=item B<activestyle>
+
+A C<Tk::ItemStyle> object that allows you to configure the
+appearance of the active tree items.
+
+=item B<undefstyle>
+
+A C<Tk::ItemStyle> object that allows you to configure the
+appearance of the undefined tree items.
+
+=back
+
 =head1 METHODS
 
-=head2 update
+=head2 data
 
-The C<update> method is the core part of the class. Just
+The C<data> method is the core part of the class. Just
 pass it any kind of perl data structure, and it will be
-visualized in the tree. You can call C<update> multiple
-times, and the tree will always be updated according to
+visualized in the tree. You can call C<data> multiple
+times, and the tree will always be data according to
 the new data structure. Changing (active) values will be
-highlighted with each C<update> call.
+highlighted with each C<data> call.
 
 =head1 BUGS
 
@@ -370,6 +416,10 @@ mail to E<lt>mhx@cpan.orgE<gt>.
 Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+See L<Tk>, L<Tk::Tree>, L<Tk::DItem> and L<Data::Dumper>.
 
 =cut
 
