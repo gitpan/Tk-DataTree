@@ -10,14 +10,14 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/04/04 11:50:38 +0200 $
-# $Revision: 8 $
-# $Snapshot: /Tk-DataTree/0.04 $
+# $Date: 2008/01/11 00:18:49 +0100 $
+# $Revision: 10 $
+# $Snapshot: /Tk-DataTree/0.05 $
 # $Source: /lib/Tk/DataTree.pm $
 #
 ################################################################################
 #
-# Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2004-2008 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
@@ -29,7 +29,7 @@ use strict;
 use vars qw($VERSION);
 
 BEGIN {
-  $VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.04 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+  $VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.05 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
   eval {
     local $ENV{PERL_DL_NONLAZY} = 0 if $ENV{PERL_DL_NONLAZY};
     require DynaLoader;
@@ -415,7 +415,7 @@ appearance of the undefined tree items.
 The C<data> method is the core part of the class. Just
 pass it any kind of perl data structure, and it will be
 visualized in the tree. You can call C<data> multiple
-times, and the tree will always be data according to
+times, and the tree will always be updated according to
 the new data structure. Changing (active) values will be
 highlighted with each C<data> call.
 
@@ -430,7 +430,7 @@ mail to E<lt>mhx@cpan.orgE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+Copyright (c) 2004-2008 Marcus Holland-Moritz. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

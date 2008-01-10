@@ -10,14 +10,14 @@
 *
 * $Project: /Tk-DataTree $
 * $Author: mhx $
-* $Date: 2004/04/03 19:55:16 +0200 $
-* $Revision: 6 $
-* $Snapshot: /Tk-DataTree/0.04 $
+* $Date: 2008/01/11 00:18:48 +0100 $
+* $Revision: 8 $
+* $Snapshot: /Tk-DataTree/0.05 $
 * $Source: /DataTree.xs $
 *
 ********************************************************************************
 *
-* Copyright (c) 2002-2003 Marcus Holland-Moritz. All rights reserved.
+* Copyright (c) 2004-2008 Marcus Holland-Moritz. All rights reserved.
 * This program is free software; you can redistribute it and/or modify
 * it under the same terms as Perl itself.
 *
@@ -64,7 +64,7 @@ PROTOTYPES: ENABLE
 #   ROUTINE: _getval
 #
 #   WRITTEN BY: Marcus Holland-Moritz             ON: Mar 2004
-#   CHANGED BY:                                   ON:
+#   CHANGED BY: Marcus Holland-Moritz             ON: Jan 2008
 #
 ################################################################################
 
@@ -86,6 +86,10 @@ _getval(val)
 		else {
 		  if (SvPOK(val) || SvPOKp(val)) {
 		    text = newSVpvn(SvPVX(val), SvCUR(val));
+#if defined(SvUTF8) && defined(SvUTF8_on)
+		    if (SvUTF8(val))
+		      SvUTF8_on(text);
+#endif
 		    if (SvNOK(val))
 		      sv_catpvf(text, " (%"NVff")", SvNVX(val));
 #if defined(SvUOK) && defined(SvUVX)

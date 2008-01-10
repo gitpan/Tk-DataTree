@@ -2,14 +2,14 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2004/04/04 11:51:34 +0200 $
-# $Revision: 5 $
-# $Snapshot: /Tk-DataTree/0.04 $
+# $Date: 2008/01/11 00:18:49 +0100 $
+# $Revision: 6 $
+# $Snapshot: /Tk-DataTree/0.05 $
 # $Source: /t/101_base.t $
 #
 ################################################################################
 #
-# Copyright (c) 2004 Marcus Holland-Moritz. All rights reserved.
+# Copyright (c) 2004-2008 Marcus Holland-Moritz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
 #
