@@ -1,6 +1,27 @@
-use 5.00503;
+################################################################################
+#
+# $Project: /Tk-DataTree $
+# $Author: mhx $
+# $Date: 2008/04/13 10:59:53 +0200 $
+# $Revision: 5 $
+# $Snapshot: /Tk-DataTree/0.06 $
+# $Source: /Makefile.PL $
+#
+################################################################################
+#
+# Copyright (c) 2004-2008 Marcus Holland-Moritz. All rights reserved.
+# This program is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+################################################################################
+
+require 5.00503;
+use strict;
+
 use ExtUtils::MakeMaker;
 use Config qw(%Config);
+
+my $no_xs;
 
 for (@ARGV) {
   /^-pm/ and $no_xs = 1;
@@ -19,16 +40,28 @@ sub write_makefile
                     },
     CONFIGURE    => \&configure,
     clean        => { FILES => 'test.c' },
-    ($] >= 5.005 ?
-      (ABSTRACT_FROM  => 'lib/Tk/DataTree.pm',
-       AUTHOR         => 'Marcus Holland-Moritz <mhx@cpan.org>') : ()
-    ),
   );
 }
 
 sub configure
 {
-  return $no_xs ? { XS => {}, C => [] } : {};
+  my @moreopts;
+
+  if (eval $ExtUtils::MakeMaker::VERSION >= 6) {
+    push @moreopts, AUTHOR => 'Marcus Holland-Moritz <mhx@cpan.org>',
+                    ABSTRACT_FROM => 'lib/Tk/DataTree.pm';
+  }
+
+  if (eval $ExtUtils::MakeMaker::VERSION >= 6.30_01) {
+    print "Setting license tag...\n";
+    push @moreopts, LICENSE => 'perl';
+  }
+
+  if ($no_xs) {
+    push @moreopts, XS => {}, C => [];
+  }
+
+  return { @moreopts };
 }
 
 write_makefile();

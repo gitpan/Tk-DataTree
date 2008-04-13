@@ -2,9 +2,9 @@
 #
 # $Project: /Tk-DataTree $
 # $Author: mhx $
-# $Date: 2008/01/11 00:18:49 +0100 $
-# $Revision: 2 $
-# $Snapshot: /Tk-DataTree/0.05 $
+# $Date: 2008/04/13 10:51:29 +0200 $
+# $Revision: 3 $
+# $Snapshot: /Tk-DataTree/0.06 $
 # $Source: /t/103_unicode.t $
 #
 ################################################################################
@@ -31,7 +31,7 @@ my $dt = $mw->DataTree(-typename => "test", -activecolor => 'blue')
 
 $mw->idletasks;
 
-require Encode;
+eval { require Encode };
 
 if ($@) {
   skip('skip: Encode not installed', 0, 0);

@@ -1,4 +1,12 @@
 -------------------------
+Version 0.06 (2008-04-13)
+-------------------------
+
+* wrap 'require Encode' in an eval {} within the
+  unicode test
+* set a license tag in Makefile.PL
+
+-------------------------
 Version 0.05 (2008-01-11)
 -------------------------
 

@@ -4,7 +4,7 @@
 # $Author: mhx $
 # $Date: 2008/01/11 00:18:49 +0100 $
 # $Revision: 7 $
-# $Snapshot: /Tk-DataTree/0.05 $
+# $Snapshot: /Tk-DataTree/0.06 $
 # $Source: /t/102_stress.t $
 #
 ################################################################################

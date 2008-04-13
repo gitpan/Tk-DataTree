@@ -12,7 +12,7 @@
 # $Author: mhx $
 # $Date: 2008/01/11 00:18:49 +0100 $
 # $Revision: 10 $
-# $Snapshot: /Tk-DataTree/0.05 $
+# $Snapshot: /Tk-DataTree/0.06 $
 # $Source: /lib/Tk/DataTree.pm $
 #
 ################################################################################
@@ -29,7 +29,7 @@ use strict;
 use vars qw($VERSION);
 
 BEGIN {
-  $VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.05 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
+  $VERSION = do { my @r = '$Snapshot: /Tk-DataTree/0.06 $' =~ /(\d+\.\d+(?:_\d+)?)/; @r ? $r[0] : '9.99' };
   eval {
     local $ENV{PERL_DL_NONLAZY} = 0 if $ENV{PERL_DL_NONLAZY};
     require DynaLoader;
